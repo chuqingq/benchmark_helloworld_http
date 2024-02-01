@@ -6,16 +6,19 @@ use tokio::net::TcpListener;
 use std::error::Error;
 
 const RESPONSE: &[u8] =
-    b"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: 11\r\n\r\nhello world";
+    b"HTTP/1.1 200 OK\r\nContent-Length: 11\r\n\r\nhello world";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let listener = TcpListener::bind("127.0.0.1:8080").await?;
+    let listener = TcpListener::bind("127.0.0.1:8081").await?;
     println!("Listening on: {}", listener.local_addr()?);
 
     // accept
     loop {
-        let (mut socket, _) = listener.accept().await.expect("accept error");
+        let (mut socket, _) = match listener.accept().await {
+            Ok(socket) => socket,
+            _ => continue,
+        };
 
         tokio::spawn(async move {
             let mut buf = vec![0; 1024];
@@ -23,10 +26,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
             loop {
                 // read
-                let n = socket
+                let n = match socket
                     .read(&mut buf[length..])
-                    .await
-                    .expect("failed to read data from socket");
+                    .await {
+                        Ok(n) => n,
+                        _ => continue, // 不打印日志
+                    };
 
                 if n == 0 {
                     return;
