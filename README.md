@@ -31,6 +31,13 @@ Requests/sec: 425484.66
 Transfer/sec:     20.29MB
 ```
 
+### rust_mio tcp
+
+```
+Requests/sec: 414454.73
+Transfer/sec:     19.76MB
+```
+
 ### go_fasthttp
 
 ```
@@ -57,11 +64,4 @@ Transfer/sec:     26.72MB
 ```
 Requests/sec: 172601.84
 Transfer/sec:      8.23MB
-```
-
-### rust_mio tcp
-
-```
-Requests/sec:  88556.64
-Transfer/sec:      4.22MB
 ```

@@ -1,5 +1,9 @@
+use std::os::fd::{AsRawFd, FromRawFd};
 // You can run this example from the root of the mio repo:
 // cargo run --example tcp_server --features="os-poll net"
+use std::thread;
+use std::time::Duration;
+
 use mio::event::Event;
 use mio::net::{TcpListener, TcpStream};
 use mio::{Events, Interest, Poll, Registry, Token};
@@ -21,6 +25,27 @@ struct Conn {
 
 #[cfg(not(target_os = "wasi"))]
 fn main() -> io::Result<()> {
+    let addr = "127.0.0.1:8081".parse().unwrap();
+    let listener = TcpListener::bind(addr)?;
+    let listener_fd = listener.as_raw_fd();
+
+    for _ in 0..8 {
+        thread::spawn(move || {
+            match thread_main(listener_fd) {
+                Ok(_) => return,
+                Err(e) => {
+                    println!("thread_main error: {e}")
+                }
+            }
+        });
+    }
+
+    loop {
+        thread::sleep(Duration::from_secs(5));
+    }
+}
+
+fn thread_main(listener_fd: i32) -> io::Result<()> {
     // env_logger::init();
 
     // Create a poll instance.
@@ -29,8 +54,9 @@ fn main() -> io::Result<()> {
     let mut events = Events::with_capacity(128);
 
     // Setup the TCP server socket.
-    let addr = "127.0.0.1:8081".parse().unwrap();
-    let mut server = TcpListener::bind(addr)?;
+    let mut server = unsafe {
+        TcpListener::from_raw_fd(listener_fd)
+    };
 
     // Register the server with poll we can receive events for it.
     poll.registry()
