@@ -22,18 +22,18 @@ fn main() -> io::Result<()> {
                     // read
                     let r = stream.read(&mut buf[length..]).await;
                     match r {
-                        Ok(n) => {
+                        Ok(n) if n != 0 => {
                             length += n;
                         }
-                        Err(_) => {
-                            return
-                        }
+                        _ => return,
                     }
                     if buf[0..length].ends_with(b"\r\n\r\n") {
                         // write
-                        let res = stream.write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 11\r\n\r\nhello world").await;
+                        let res = stream
+                            .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 11\r\n\r\nhello world")
+                            .await;
                         match res {
-                            Ok(_)=> {
+                            Ok(_) => {
                                 // 发送成功
                                 length = 0
                             }
@@ -45,6 +45,7 @@ fn main() -> io::Result<()> {
                 }
             });
         }
+        println!("server stopped");
         Ok(())
     })
 }

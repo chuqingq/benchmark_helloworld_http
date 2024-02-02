@@ -41,8 +41,8 @@ Transfer/sec:     55.92MB
 ### rust_async_std tcp
 
 ```
-Requests/sec: 249075.51
-Transfer/sec:     11.88MB
+Requests/sec: 344484.85
+Transfer/sec:     16.43MB
 ```
 
 ### go_std_http
