@@ -5,6 +5,8 @@ use async_std::net::TcpListener;
 use async_std::prelude::*;
 use async_std::task;
 
+const RESPONSE: &[u8] = b"HTTP/1.1 200 OK\r\nContent-Length: 11\r\n\r\nhello world";
+
 fn main() -> io::Result<()> {
     task::block_on(async {
         let listener = TcpListener::bind("127.0.0.1:8081").await?;
@@ -15,30 +17,29 @@ fn main() -> io::Result<()> {
         while let Some(stream) = incoming.next().await {
             let mut stream = stream?;
             task::spawn(async move {
-                let mut length: usize = 0;
-                let mut buf = [0; 1024];
+                let mut buflen: usize = 0;
+                let mut buf = vec![0; 256];
+                // let mut buf = [0; 256];
 
                 loop {
                     // read
-                    let r = stream.read(&mut buf[length..]).await;
+                    let r = stream.read(&mut buf[buflen..]).await;
                     match r {
-                        Ok(n) if n != 0 => {
-                            length += n;
+                        Ok(n) if n != 0 => buflen += n,
+                        Ok(_) => return,
+                        Err(_) => {
+                            // println!("read error: {e}");
+                            return;
                         }
-                        _ => return,
                     }
-                    if buf[0..length].ends_with(b"\r\n\r\n") {
+                    if buf[0..buflen].ends_with(b"\r\n\r\n") {
                         // write
-                        let res = stream
-                            .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 11\r\n\r\nhello world")
-                            .await;
+                        let res = stream.write_all(RESPONSE).await;
                         match res {
-                            Ok(_) => {
-                                // 发送成功
-                                length = 0
-                            }
-                            Err(_) => {
-                                println!("write error")
+                            Ok(_) => buflen = 0,
+                            Err(e) => {
+                                println!("write error: {e}");
+                                return;
                             }
                         }
                     }
