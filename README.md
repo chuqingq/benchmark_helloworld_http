@@ -41,8 +41,8 @@ Transfer/sec:     23.26MB
 ### go_fasthttp
 
 ```
-Requests/sec: 401638.02
-Transfer/sec:     55.92MB
+Requests/sec: 430998.88
+Transfer/sec:     60.01MB
 ```
 
 ### rust_async_std tcp
