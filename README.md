@@ -65,3 +65,17 @@ Transfer/sec:     26.72MB
 Requests/sec: 172601.84
 Transfer/sec:      8.23MB
 ```
+
+### python_fastapi
+
+```
+Requests/sec:  15615.48
+Transfer/sec:      2.16MB
+```
+
+### python_tornado
+
+```
+Requests/sec:   5718.08
+Transfer/sec:      1.12MB
+```
