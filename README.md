@@ -66,6 +66,13 @@ Requests/sec: 172601.84
 Transfer/sec:      8.23MB
 ```
 
+### bun
+
+```
+Requests/sec: 108556.88
+Transfer/sec:     13.15MB
+```
+
 ### python_fastapi
 
 ```
@@ -79,3 +86,4 @@ Transfer/sec:      2.16MB
 Requests/sec:   5718.08
 Transfer/sec:      1.12MB
 ```
+
